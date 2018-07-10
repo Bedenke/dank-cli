@@ -17,27 +17,23 @@ export default class ScssCompiler {
     const sourceFile = this.entryFile;
     console.info("🌶️  Compiling:", sourceFile);
 
-    const parsed = path.parse(sourceFile);
-    const relativeDir = parsed.dir.replace(this.sourceDir, "/");
-    const cssOutDir = path.join(this.outputDir, relativeDir);
-    const cssOutFile = path.join(cssOutDir, parsed.name + ".css");
-    const cssOutMinFile = path.join(cssOutDir, parsed.name + ".min.css");
+    const cssOutFile = path.join(this.outputDir, "index.css");
 
-    fs.ensureDirSync(cssOutDir);
+    fs.ensureDirSync(this.outputDir);
 
     let css = sass.renderSync({ file: sourceFile }).css.toString();
     fs.writeFileSync(cssOutFile, css);
     console.info("🍔 Generated", cssOutFile);
 
-    let minCss = sass
-      .renderSync({ file: sourceFile, outputStyle: "compact" })
-      .css.toString();
-    fs.writeFileSync(cssOutMinFile, minCss);
-    console.info("🍔 Generated", cssOutMinFile);
+    // let minCss = sass
+    //   .renderSync({ file: sourceFile, outputStyle: "compact" })
+    //   .css.toString();
+    // fs.writeFileSync(cssOutMinFile, minCss);
+    // console.info("🍔 Generated", cssOutMinFile);
 
     cb([
-      path.join(relativeDir, parsed.name + ".css"),
-      path.join(relativeDir, parsed.name + ".min.css")
+      "index.css",
+      //path.join(relativeDir, parsed.name + ".min.css")
     ]);
   }
 }

@@ -26,11 +26,11 @@ exports.default = (req, res) => __awaiter(this, void 0, void 0, function* () {
                 delete require.cache[k];
             }
         }
-        let transpiledSourceFile = path_1.default.join(process.cwd(), ".gen", "dist", "src", "App.js");
+        let transpiledSourceFile = path_1.default.join(process.cwd(), ".gen", "dist", "server.js");
         const importedJS = require(transpiledSourceFile);
-        const App = importedJS.default;
+        const Server = importedJS.default;
         const htmlEngine = new dank_web_1.HtmlEngine();
-        const html = yield htmlEngine.render(App, context);
+        const html = yield htmlEngine.render(Server(context), context);
         res.set("Content-Type", "text/html; charset=utf-8");
         res.send(htmlPrefix + html);
     }

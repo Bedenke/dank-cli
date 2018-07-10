@@ -19,11 +19,20 @@ export default class Compiler {
 
   constructor() {
     const localDir = process.cwd();
-    this.sourceDir = path.join(localDir, "src");
-    const outputDir = path.join(localDir, ".gen")
-    this.ts = new TsCompiler(path.join(localDir, "index.ts"), path.join(outputDir, "dist"));
-    this.js = new JsCompiler(path.join(outputDir, "dist", "index.js"), outputDir);
-    this.scss = new ScssCompiler(this.sourceDir, path.join(localDir, "index.scss"), outputDir);
+    this.sourceDir = path.join(localDir);
+    const outputDir = path.join(localDir, ".gen");
+    const outputDistDir = path.join(localDir, ".gen", "dist");
+    const outputStaticDir = path.join(localDir, ".gen", "static");
+    this.ts = new TsCompiler(
+      [path.join(localDir, "client.ts"), path.join(localDir, "server.ts")],
+      outputDistDir
+    );
+    this.js = new JsCompiler(path.join(outputDir, "dist", "client.js"), outputStaticDir);
+    this.scss = new ScssCompiler(
+      this.sourceDir,
+      path.join(localDir, "index.scss"),
+      outputStaticDir
+    );
   }
 
   compile(cb: CompileCallback) {
@@ -42,11 +51,8 @@ export default class Compiler {
       let parsed = path.parse(name);
 
       if (tsExtensions[parsed.ext]) {
-        return _this.ts.compile(cb);
-      }
-
-      if (jsExtensions[parsed.ext]) {
-        return _this.js.compile(cb);
+        if (parsed.dir.indexOf(".gen") >= 0) return;
+        return _this.ts.compile(() => _this.js.compile(cb));
       }
 
       if (cssExtensions[parsed.ext]) {

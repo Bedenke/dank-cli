@@ -1,18 +1,18 @@
 import ts from "typescript";
 
 export default class TsCompiler {
-  entryFile: string;
+  entryFiles: string[];
   outputDir: string;
 
-  constructor(entryFile: string, outDir: string) {
-    this.entryFile = entryFile;
+  constructor(entryFiles: string[], outDir: string) {
+    this.entryFiles = entryFiles;
     this.outputDir = outDir;
   }
 
   compile(cb: (files: string[]) => void) {
     try {
-      console.info("🌶️  Compiling:", this.entryFile);
-      let program = ts.createProgram([this.entryFile], {
+      console.info("🌶️  Compiling:", this.entryFiles);
+      let program = ts.createProgram(this.entryFiles, {
         module: ts.ModuleKind.CommonJS,
         outDir: this.outputDir
       });
@@ -21,6 +21,6 @@ export default class TsCompiler {
       console.error("🔥   FAILED");
       console.trace(err.formatted || err);
     }
-    cb([this.outputDir]);
+    cb([]);
   }
 }

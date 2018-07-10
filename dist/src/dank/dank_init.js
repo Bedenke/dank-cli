@@ -4,91 +4,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
-const slugify_1 = __importDefault(require("slugify"));
 const utils_1 = __importDefault(require("../utils"));
+const dank_templates_1 = require("./dank_templates");
 function dankInit(project) {
     console.info("🚀 Initializing dank");
-    let packageFileContent = `
-{
-  "name": "${slugify_1.default(project).toLowerCase()}",
-  "description": "${project}",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "dependencies": {
-    "dank-web": "file:../dank-web"
-  },
-  "prettier": {
-    "tabWidth": 2,
-    "printWidth": 100
-  }
-}`;
-    const packageFile = utils_1.default.saveFile(".", "package.json", packageFileContent);
+    const packageFile = utils_1.default.saveFile(".", "package.json", dank_templates_1.package_json(project));
     console.log("🍔 Created file", packageFile);
-    let appFileContent = `
-  import { website, div, script, link } from "dank-web";
-
-  export default website({
-    routes: [
-      { path: "/", render: context => div("Index") },
-      {
-        path: "/example/:id",
-        render: context => div("Example param: " + context.browser.request.params.id)
-      }
-    ],
-    renderHead: context => {
-      const contextData = {};
-      return [
-        script({ src: "/static/gen/bundle.js" }),
-        script(
-          { type: "text/javascript" },
-          "window.__context_data__ = "+JSON.stringify(contextData)
-        ),
-        link({
-          rel: "stylesheet",
-          type: "text/css",
-          href: "/static/gen/index.css"
-        })
-      ];
-    },
-    renderBody: (children, context) => {
-      return div({ id: "app" });
-    },
-    renderNotFound: context => {
-      return div({ class: "page-not-found" }, "PAGE NOT FOUND: " + context.browser.request.url);
-    }
-  });  
-
-  `;
-    let appFile = utils_1.default.saveFile("src", "App.ts", appFileContent);
+    let appFile = utils_1.default.saveFile("src", "App.ts", dank_templates_1.app_ts);
     console.log("🍔 Created file", appFile);
-    let appScssFile = utils_1.default.saveFile("src", "App.scss", `#app { color: black }`);
+    let appScssFile = utils_1.default.saveFile("src", "App.scss", dank_templates_1.app_scss);
     console.log("🍔 Created file", appScssFile);
-    const indexJsContent = `
-import { DomEngine, Context } from "dank-web";
-import App from "./src/App";
-
-const domEngine = new DomEngine();
-
-window.onpopstate = function(event) {
-  //context.browser.back();
-};
-
-window.onerror = function(msg, file, line, col, error) {
-  // context.router.error(msg)
-  // return false;
-};
-
-window.onload = function(event) {
-  const appRoot = document.getElementById("app");
-  if (appRoot) {
-    const contextData = (window as any).__context_data__;
-    const context = new Context(contextData);
-    domEngine.render(appRoot, App, context);
-  }
-};
-`;
-    let indexJs = utils_1.default.saveFile(".", "index.ts", indexJsContent);
-    console.log("🍔 Created file", indexJs);
+    let clientJSFile = utils_1.default.saveFile(".", "client.ts", dank_templates_1.client_ts);
+    console.log("🍔 Created file", clientJSFile);
+    let serverJSFile = utils_1.default.saveFile(".", "server.ts", dank_templates_1.server_ts);
+    console.log("🍔 Created file", serverJSFile);
     console.log("");
     console.log("🔽 npm install");
     let npm = child_process_1.spawn("npm", ["install"]);

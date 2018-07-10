@@ -15,11 +15,13 @@ const cssExtensions = { ".scss": true };
 class Compiler {
     constructor() {
         const localDir = process.cwd();
-        this.sourceDir = path_1.default.join(localDir, "src");
+        this.sourceDir = path_1.default.join(localDir);
         const outputDir = path_1.default.join(localDir, ".gen");
-        this.ts = new ts_compiler_1.default(path_1.default.join(localDir, "index.ts"), path_1.default.join(outputDir, "dist"));
-        this.js = new js_compiler_1.default(path_1.default.join(outputDir, "dist", "index.js"), outputDir);
-        this.scss = new scss_compiler_1.default(this.sourceDir, path_1.default.join(localDir, "index.scss"), outputDir);
+        const outputDistDir = path_1.default.join(localDir, ".gen", "dist");
+        const outputStaticDir = path_1.default.join(localDir, ".gen", "static");
+        this.ts = new ts_compiler_1.default([path_1.default.join(localDir, "client.ts"), path_1.default.join(localDir, "server.ts")], outputDistDir);
+        this.js = new js_compiler_1.default(path_1.default.join(outputDir, "dist", "client.js"), outputStaticDir);
+        this.scss = new scss_compiler_1.default(this.sourceDir, path_1.default.join(localDir, "index.scss"), outputStaticDir);
     }
     compile(cb) {
         dank_imports_1.default();
@@ -35,10 +37,9 @@ class Compiler {
         node_watch_1.default(this.sourceDir, { recursive: true }, function (evt, name) {
             let parsed = path_1.default.parse(name);
             if (tsExtensions[parsed.ext]) {
-                return _this.ts.compile(cb);
-            }
-            if (jsExtensions[parsed.ext]) {
-                return _this.js.compile(cb);
+                if (parsed.dir.indexOf(".gen") >= 0)
+                    return;
+                return _this.ts.compile(() => _this.js.compile(cb));
             }
             if (cssExtensions[parsed.ext]) {
                 return _this.scss.compile(cb);

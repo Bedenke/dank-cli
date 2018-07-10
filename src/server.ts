@@ -5,7 +5,7 @@ import context from "./context";
 import dank_renderer from "./dank/dank_renderer";
 
 const localDir = process.cwd();
-const staticDir = path.resolve(localDir, ".gen");
+const staticDir = path.resolve(localDir, ".gen", "static");
 
 const app = express();
 
@@ -13,7 +13,8 @@ const instantMiddleware = instant();
 
 context.compilerCallback = files => {
   for (const file of files) {
-    instantMiddleware.reload(path.join("/", "static", file));
+    const url = path.join("/", "static", "gen", file);
+    instantMiddleware.reload(url);
   }
 };
 
@@ -27,6 +28,6 @@ app.use(
   })
 );
 
-app.get("/*", dank_renderer);
+app.use(dank_renderer);
 
 export default app;

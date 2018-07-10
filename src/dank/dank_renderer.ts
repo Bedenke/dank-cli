@@ -18,12 +18,12 @@ export default async (req: express.Request, res:express.Response) => {
       }
     }
 
-    let transpiledSourceFile = path.join(process.cwd(), ".gen", "dist", "src", "App.js");
+    let transpiledSourceFile = path.join(process.cwd(), ".gen", "dist", "server.js");
     const importedJS = require(transpiledSourceFile);
-    const App = importedJS.default;
+    const Server = importedJS.default;
 
     const htmlEngine = new HtmlEngine();
-    const html = await htmlEngine.render(App, context);
+    const html = await htmlEngine.render(Server(context), context);
 
     res.set("Content-Type", "text/html; charset=utf-8");
     res.send(htmlPrefix + html);
