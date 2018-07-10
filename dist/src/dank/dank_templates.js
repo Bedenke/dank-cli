@@ -10,7 +10,7 @@ function package_json(project) {
   "name": "${slugify_1.default(project).toLowerCase()}",
   "description": "${project}",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/client.js",
   "dependencies": {
     "dank-web": "file:../dank-web"
   },
