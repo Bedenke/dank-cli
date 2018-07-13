@@ -6,10 +6,6 @@ const htmlPrefix = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//E
 
 export default async (req: express.Request, res:express.Response) => {
   try {
-    let context = new Context({});
-    context.browser.setTitle("Dank Dev");
-    context.browser.go(req.url);
-
     // Clear cached modules
     const sourceDirectory = path.join(process.cwd(), "src");
     for (let k of Object.keys(require.cache)) {
@@ -21,6 +17,14 @@ export default async (req: express.Request, res:express.Response) => {
     let transpiledSourceFile = path.join(process.cwd(), ".gen", "dist", "server.js");
     const importedJS = require(transpiledSourceFile);
     const Server = importedJS.default;
+
+    let context = new Context({
+      stores: {
+        session: req.cookies.session
+      }
+    });
+    context.browser.setTitle("Dank Dev");
+    context.browser.go(req.url);    
 
     const htmlEngine = new HtmlEngine();
     const html = await htmlEngine.render(Server(context), context);

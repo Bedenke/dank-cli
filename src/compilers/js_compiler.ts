@@ -13,15 +13,16 @@ export default class JsCompiler {
 
   compile(cb: (files: string[]) => void) {
     let compiler = Webpack({
-      devtool: "eval",
+      devtool: "cheap-module-source-map",
       mode: "development",
       entry: [this.entryFile],
       output: {
         path: this.outputDir,
         filename: "bundle.js"
       },
+      plugins: [new Webpack.DefinePlugin({ "global.GENTLY": false })],
       resolve: {
-        extensions: [".js"]
+        extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
       }
     });
 
@@ -29,11 +30,11 @@ export default class JsCompiler {
 
     console.info("🌶️  Compiling:", this.entryFile);
 
-    const outputFile = path.join(this.outputDir,"bundle.js");
+    const outputFile = path.join(this.outputDir, "bundle.js");
     compiler.run((err, stats) => {
       if (err || stats.hasErrors()) {
         // Handle errors here
-        console.error(err, stats);        
+        console.error(err, stats);
         return;
       }
 

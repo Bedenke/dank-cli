@@ -16,9 +16,6 @@ const path_1 = __importDefault(require("path"));
 const htmlPrefix = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">`;
 exports.default = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        let context = new dank_web_1.Context({});
-        context.browser.setTitle("Dank Dev");
-        context.browser.go(req.url);
         // Clear cached modules
         const sourceDirectory = path_1.default.join(process.cwd(), "src");
         for (let k of Object.keys(require.cache)) {
@@ -29,6 +26,13 @@ exports.default = (req, res) => __awaiter(this, void 0, void 0, function* () {
         let transpiledSourceFile = path_1.default.join(process.cwd(), ".gen", "dist", "server.js");
         const importedJS = require(transpiledSourceFile);
         const Server = importedJS.default;
+        let context = new dank_web_1.Context({
+            stores: {
+                session: req.cookies.session
+            }
+        });
+        context.browser.setTitle("Dank Dev");
+        context.browser.go(req.url);
         const htmlEngine = new dank_web_1.HtmlEngine();
         const html = yield htmlEngine.render(Server(context), context);
         res.set("Content-Type", "text/html; charset=utf-8");

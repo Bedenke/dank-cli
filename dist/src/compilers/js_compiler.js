@@ -13,15 +13,16 @@ class JsCompiler {
     }
     compile(cb) {
         let compiler = webpack_1.default({
-            devtool: "eval",
+            devtool: "cheap-module-source-map",
             mode: "development",
             entry: [this.entryFile],
             output: {
                 path: this.outputDir,
                 filename: "bundle.js"
             },
+            plugins: [new webpack_1.default.DefinePlugin({ "global.GENTLY": false })],
             resolve: {
-                extensions: [".js"]
+                extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
             }
         });
         fs_extra_1.default.ensureDirSync(this.outputDir);
